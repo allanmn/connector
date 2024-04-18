@@ -1,5 +1,6 @@
 import 'package:connector/controllers/tabs_controller.dart';
 import 'package:connector/pages/home_page.dart';
+import 'package:connector/pages/rooms_page.dart';
 import 'package:connector/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,17 +22,14 @@ class TabsPage extends GetView<TabsController> {
             type: BottomNavigationBarType.fixed,
             items: const [
               BottomNavigationBarItem(
-                  icon: FaIcon(FontAwesomeIcons.house), label: 'Home'),
+                  icon: FaIcon(FontAwesomeIcons.house), label: 'Início'),
               BottomNavigationBarItem(
-                  icon: FaIcon(FontAwesomeIcons.wallet), label: 'Carteiras'),
+                  icon: FaIcon(FontAwesomeIcons.personShelter),
+                  label: 'Cômodos'),
               BottomNavigationBarItem(
-                icon: FaIcon(FontAwesomeIcons.piggyBank),
-                label: 'Orçamentos',
+                icon: FaIcon(FontAwesomeIcons.chartColumn),
+                label: 'Gráficos',
               ),
-              // BottomNavigationBarItem(
-              //   icon: FaIcon(FontAwesomeIcons.fileExcel),
-              //   label: 'Transações',
-              // ),
             ],
             onTap: (index) => controller.changePage(index),
           )),
@@ -43,6 +41,7 @@ class TabsPage extends GetView<TabsController> {
                 index: controller.currentIndex.value,
                 children: [
                   HomePage(),
+                  RoomsPage(),
                 ],
               ),
             ),
