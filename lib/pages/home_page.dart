@@ -118,7 +118,7 @@ class HomePage extends GetView<HomeController> {
                                       width: 20,
                                     ),
                                     Text(
-                                      'Todal de Cômodos: ${controller.roomsRepository.rooms.length}',
+                                      'Total de Cômodos: ${controller.roomsRepository.rooms.length}',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14,
@@ -130,12 +130,14 @@ class HomePage extends GetView<HomeController> {
                               Expanded(
                                 flex: 1,
                                 child: IconButton(
-                                  icon: const Icon(Icons.add),
+                                  icon: const Icon(Icons.remove_red_eye),
                                   style: IconButton.styleFrom(
                                     padding: const EdgeInsets.all(0),
                                   ),
                                   iconSize: 40,
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    tabsController.changePage(1);
+                                  },
                                   color: AppTheme.colors.primary,
                                 ),
                               ),

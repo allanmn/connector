@@ -1,4 +1,6 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:connector/helpers/cooma_dot_input_formatter.dart';
+import 'package:connector/helpers/helpers.dart';
 import 'package:connector/helpers/negative_number_input_formatter.dart';
 import 'package:connector/models/room.dart';
 import 'package:connector/theme/app_theme.dart';
@@ -6,6 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
+import 'package:flutter_internet_signal/flutter_internet_signal.dart';
+import 'package:flutter_internet_speed_test/flutter_internet_speed_test.dart';
 
 class CreateRoom extends StatefulWidget {
   Room? room;
@@ -38,6 +43,136 @@ class _CreateRoomState extends State<CreateRoom> {
   final _formKey = GlobalKey<FormState>();
 
   final RegExp _regex = RegExp(r'^[\d.,-]*$');
+
+  _getIntensity(bool is5g) async {
+    final List<ConnectivityResult> connectivityResult =
+        await Connectivity().checkConnectivity();
+    if (!connectivityResult.contains(ConnectivityResult.wifi)) {
+      return Helpers.toast(
+        title: "Sem conexão wifi",
+        message:
+            "Por favor, conecte-se a uma rede wifi para realizar essa ação.",
+        color: AppTheme.colors.warning,
+      );
+    }
+    final FlutterInternetSignal internetSignal = FlutterInternetSignal();
+    final int? wifiSignal = await internetSignal.getWifiSignalStrength();
+
+    if (is5g) {
+      widget.linkStrengthController.text = "$wifiSignal";
+    } else {
+      widget.legacyLinkStrengthController.text = "$wifiSignal";
+    }
+
+    // ignore: use_build_context_synchronously
+    Navigator.pop(context);
+  }
+
+  _getVelocity(bool is5g) async {
+    var percentage = 0.0.obs;
+    final List<ConnectivityResult> connectivityResult =
+        await Connectivity().checkConnectivity();
+    if (!connectivityResult.contains(ConnectivityResult.wifi)) {
+      return Helpers.toast(
+        title: "Sem conexão wifi",
+        message:
+            "Por favor, conecte-se a uma rede wifi para realizar essa ação.",
+        color: AppTheme.colors.warning,
+      );
+    }
+
+    Loader.show(
+      // ignore: use_build_context_synchronously
+      context,
+      progressIndicator: Obx(
+        () => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(
+                color: AppTheme.colors.dark,
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Text(
+                "${percentage.value.toStringAsPrecision(2)}%",
+                style: TextStyle(
+                  fontSize: 20,
+                  decoration: TextDecoration.none,
+                  color: AppTheme.colors.dark,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final speedTest = FlutterInternetSpeedTest();
+    speedTest.startTesting(
+        downloadTestServer: 'https://fast.com/',
+        uploadTestServer: 'http://speedtest.ftp.otenet.gr/',
+        fileSize: 5000,
+        onDone: (download, upload) {
+          if (is5g) {
+            widget.linkSpeedController.text = "${download.transferRate}";
+          } else {
+            widget.legacyLinkSpeedController.text = "${download.transferRate}";
+          }
+          Loader.hide();
+          Navigator.pop(context);
+        },
+        onProgress: (percent, data) {
+          percentage.value = percent;
+        },
+        onError: (errorMessage, speedTestError) {
+          Loader.hide();
+          Helpers.toast(
+            title: 'Erro',
+            message: "Erro ao testar a velocidade",
+            color: AppTheme.colors.danger,
+          );
+          Navigator.pop(context);
+        });
+  }
+
+  Future<void> _dialog() {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            title: const Text("Selecione a opção desejada"),
+            children: [
+              SimpleDialogOption(
+                child: const Text("Velociade de conexão 5G"),
+                onPressed: () {
+                  _getVelocity(true);
+                },
+              ),
+              SimpleDialogOption(
+                child: const Text("Velocidade de conexão 2,4g"),
+                onPressed: () {
+                  _getVelocity(false);
+                },
+              ),
+              SimpleDialogOption(
+                child: const Text("Intensidade de sinal 5G"),
+                onPressed: () {
+                  _getIntensity(true);
+                },
+              ),
+              SimpleDialogOption(
+                child: const Text("Intensidade de sinal 2,4G"),
+                onPressed: () {
+                  _getIntensity(false);
+                },
+              )
+            ],
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +209,19 @@ class _CreateRoomState extends State<CreateRoom> {
                     },
                     child: const FaIcon(
                       FontAwesomeIcons.xmark,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 5,
+                  right: 0,
+                  child: InkWell(
+                    onTap: () async {
+                      await _dialog();
+                    },
+                    child: const FaIcon(
+                      FontAwesomeIcons.bars,
                       size: 20,
                     ),
                   ),

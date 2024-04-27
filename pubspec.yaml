@@ -40,6 +40,11 @@ dependencies:
   sqflite: ^2.3.3
   font_awesome_flutter: ^10.7.0
   sqflite_common_ffi: ^2.3.3
+  connectivity_plus: ^6.0.3
+  loader_overlay: ^4.0.0
+  flutter_overlay_loader: ^2.0.0
+  flutter_internet_speed_test: ^1.0.1
+  flutter_internet_signal: ^0.0.30
 
 dev_dependencies:
   flutter_test:
