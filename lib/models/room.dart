@@ -39,7 +39,9 @@ class Room {
       legacyLinkStrength: json["legacy_link_strength"],
       linkSpeed: json["link_speed"],
       linkStrength: json["link_strength"],
-      interference: json["interference"]);
+      interference: json["interference"] is String
+          ? double.parse(json["interference"])
+          : json["interference"]);
 
   Map<String, dynamic> toJson() {
     return {

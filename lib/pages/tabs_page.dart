@@ -1,5 +1,6 @@
 import 'package:connector/controllers/tabs_controller.dart';
 import 'package:connector/pages/home_page.dart';
+import 'package:connector/pages/report_page.dart';
 import 'package:connector/pages/rooms_page.dart';
 import 'package:connector/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,10 @@ class TabsPage extends GetView<TabsController> {
                 icon: FaIcon(FontAwesomeIcons.chartColumn),
                 label: 'Gráficos',
               ),
+              BottomNavigationBarItem(
+                icon: FaIcon(FontAwesomeIcons.book),
+                label: 'Relatórios',
+              ),
             ],
             onTap: (index) => controller.changePage(index),
           )),
@@ -42,6 +47,8 @@ class TabsPage extends GetView<TabsController> {
                 children: [
                   HomePage(),
                   RoomsPage(),
+                  RoomsPage(),
+                  ReportPage(),
                 ],
               ),
             ),
